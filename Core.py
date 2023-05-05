@@ -67,20 +67,39 @@ def distance_from_mouse_to_rocks():
 
 def rock_clicked():
     global move_window
+    flag_range_planet_index = None   # range_planet_index is saved here when the method wants to create a window.
+    flag_to_make_a_window = True    # It is set to false when this method recognises that a window is already there.
     for delete in range(len(planets.array)):
         planets.array[delete].unselect_it()
-    for range_and_planets in range(len(planets.array)):
-        if planets.array[range_and_planets].radius > distances[range_and_planets]:
-            planets.array[range_and_planets].select_it()
-            windows.create_and_insert_window((200 + move_window[0], 50 + move_window[1]), (250, 400),
-                                             planets.array[range_and_planets],
-                                             (planets.array[range_and_planets].get_name()))
-    if move_window[0] != 400:
-        move_window[0] += 50
-        move_window[1] += 50
-    else:
-        move_window[0] = 0
-        move_window[1] = 0
+    for range_planet_index in range(len(planets.array)):
+        if planets.array[range_planet_index].radius > distances[range_planet_index]:
+            # if planet radius is smaller than the one of the distance between mouse and a planet
+            if range(len(windows.array)) == range(0, 0):
+                flag_range_planet_index = range_planet_index  # if no window was created, set it to the planet index
+            else:
+                # If there is already a window, check if the user is clicking on a planet that already is showing a
+                # window. If not, set the flag to planet's index. If true, then set the flag_to_make_a_window to False.
+                for check_windows in range(len(windows.array)):
+                    if planets.array[range_planet_index].name != windows.array[check_windows].name:
+                        flag_range_planet_index = range_planet_index
+                    else:
+                        flag_to_make_a_window = False
+            if flag_to_make_a_window:   # if flag is true, go to the create_window method to make one!
+                create_window(flag_range_planet_index)
+    if flag_to_make_a_window:   # move the window a bit (50 pixels) to the right and down
+        if move_window[0] != 400:
+            move_window[0] += 50
+            move_window[1] += 50
+        else:
+            move_window[0] = 0
+            move_window[1] = 0
+
+
+def create_window(range_and_planets):
+    planets.array[range_and_planets].select_it()
+    windows.create_and_insert_window((200 + move_window[0], 50 + move_window[1]), (250, 400),
+                                     planets.array[range_and_planets],
+                                     (planets.array[range_and_planets].get_name()))
 
 
 def key_clicked(name):
