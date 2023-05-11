@@ -6,8 +6,10 @@ from pygame import Rect, K_BACKSPACE, K_RETURN
 from Star import Star
 from Planet import Planet
 from Moon import Moon
+from Asteroid import Asteroid
 from ArrayList import PlanetList
 from ArrayList import MoonList
+from ArrayList import AsteroidList
 from ArrayList import WindowList
 from ResourceList import PlayerResources
 
@@ -190,6 +192,8 @@ def mainloop():
         moons.array[amount_of_moons].gravity_to_planet()
     for amount_of_planets in range(len(planets.array)):
         planets.array[amount_of_planets].gravity_to_star()
+    for amount_of_asteroids in range(len(asteroids.array)):
+        asteroids.array[amount_of_asteroids].gravity_to_star()
 
     while running:
 
@@ -270,6 +274,9 @@ def mainloop():
         for i in range(len(planets.array)):
             planets.array[i].draw_my_orbit(screen)
 
+        # for i in range(len(asteroids.array)):
+        #     asteroids.array[i].draw_my_orbit(screen)
+
         # --- StarPlanetMoonAsteroid ---
 
         # pygame.draw.circle(screen, s1.colour, s1.pos, s1.radius, width=s1.radius-1)
@@ -280,6 +287,9 @@ def mainloop():
 
         for amount_of_moons in range(len(moons.array)):
             moons.array[amount_of_moons].draw_me(screen)
+
+        for i in range(len(asteroids.array)):
+            asteroids.array[i].draw_me(screen)
 
         distance_from_mouse_to_rocks()
         #distance()
@@ -320,6 +330,8 @@ def mainloop():
             moons.array[amount_of_moons].change_rel_pos(mouse_x/2, mouse_y/2)
         for i in range(len(planets.array)):
             planets.array[i].change_rel_pos(mouse_x/2, mouse_y/2)
+        for i in range(len(asteroids.array)):
+            asteroids.array[i].change_rel_pos(mouse_x / 2, mouse_y / 2)
 
         # do some calculations here
         if time_forward is True:
@@ -327,6 +339,8 @@ def mainloop():
                 if j < move_time_forward:
                     for i in range(len(planets.array)):
                         planets.array[i].move(button_pause_bool)
+                    for amount_of_asteroids in range(len(asteroids.array)):
+                        asteroids.array[amount_of_asteroids].move(button_pause_bool)
                     for amount_of_moons in range(len(moons.array)):
                         moons.array[amount_of_moons].move(button_pause_bool)
                         moons.array[amount_of_moons].update_main_planet_true_pos()
@@ -341,6 +355,8 @@ def mainloop():
                     if j < accelerate_time:
                         for i in range(len(planets.array)):
                             planets.array[i].move(button_pause_bool)
+                        for amount_of_asteroids in range(len(asteroids.array)):
+                            asteroids.array[amount_of_asteroids].move(button_pause_bool)
                         for amount_of_moons in range(len(moons.array)):
                             moons.array[amount_of_moons].move(button_pause_bool)
                             moons.array[amount_of_moons].update_main_planet_true_pos()
@@ -350,6 +366,8 @@ def mainloop():
             else:
                 for i in range(len(planets.array)):
                     planets.array[i].move(button_pause_bool)
+                for amount_of_asteroids in range(len(asteroids.array)):
+                    asteroids.array[amount_of_asteroids].move(button_pause_bool)
                 for amount_of_moons in range(len(moons.array)):
                     moons.array[amount_of_moons].move(button_pause_bool)
                     moons.array[amount_of_moons].update_main_planet_true_pos()
@@ -413,6 +431,14 @@ m5 = Moon([51, 51], 5, 10, '#a3a3a3', "m5")
 m5.main_planet(p5)
 m6 = Moon([45, 45], 4, 8, '#f8a8a8', "m6")
 m6.main_planet(p5)
+a1 = Asteroid([550, 550], 2, 4, '#a0a0a0', '#a1', 0, 0, 0, 0)
+a1.main_star(s1)
+a2 = Asteroid([560, 560], 3, 6, '#a0a0a0', '#a2', 0, 0, 0, 69696969)
+a2.main_star(s1)
+a3 = Asteroid([570, 570], 2, 4, '#a0a0a0', '#a3', 0, 0, 0, 4562)
+a3.main_star(s1)
+a4 = Asteroid([580, 580], 4, 8, '#a0a0a0', '#a4', 0, 0, 0, 8899)
+a4.main_star(s1)
 
 planets = PlanetList()
 planets.add_planet(p1)
@@ -431,6 +457,12 @@ moons.add_moon(m3)
 moons.add_moon(m4)
 moons.add_moon(m5)
 moons.add_moon(m6)
+
+asteroids = AsteroidList()
+asteroids.add_asteroid(a1)
+asteroids.add_asteroid(a2)
+asteroids.add_asteroid(a3)
+asteroids.add_asteroid(a4)
 
 
 # --- Images ---

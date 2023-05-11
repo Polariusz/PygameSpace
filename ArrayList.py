@@ -59,6 +59,35 @@ class MoonList:
                 break
 
 
+class AsteroidList:
+    def __init__(self):
+        self.array = []
+        self.temp = None
+
+    def add_asteroid(self, p):
+        self.array.append(p)
+
+    def del_asteroid_index(self, index):
+        temp_name = self.array[index].get_name()
+        self.array.pop(index)
+        print("IN ARRAYLIST|AsteroidList|-del_asteroid_index: Asteroid {}, deleted!".format(temp_name))
+
+    def del_asteroid_name(self, name):
+        for i in range(len(self.array)):
+            if self.array[i].get_name() == name:
+                self.array.pop(i)
+                print("IN ARRAYLIST|AsteroidList|-del_asteroid_name: Asteroid {}, deleted!".format(name))
+                break
+
+    def del_asteroid_object(self, planet):
+        for i in range(len(self.array)):
+            if self.array[i] == planet:
+                temp_name = self.array[i].get_name()
+                self.array.pop(i)
+                print("IN ARRAYLIST|PlanetList|-del_asteroid_object: Asteroid {}, deleted!".format(temp_name))
+                break
+
+
 class WindowList:
     def __init__(self):
         self.array = []
