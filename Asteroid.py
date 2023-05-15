@@ -8,7 +8,7 @@ from ResourceList import BigRockResources
 class Asteroid:
     G = (6.674 * 10 ** (-11))
 
-    def __init__(self, pos, radius, mass, colour, name, habitability, x_deviation, y_deviation, set_angle):
+    def __init__(self, pos, radius, mass, colour, name, habitability, x_deviation, y_deviation, set_angle, colonised):
         self.name = name
         self.pos = pos
         self.true_pos = self.pos
@@ -20,6 +20,8 @@ class Asteroid:
         self.x_deviation = x_deviation
         self.y_deviation = y_deviation
         self.habitability = habitability
+        self.starting_angle = set_angle
+        self.colonised = colonised
 
         self.starting_pos = [0, 0, False]
         self.resources = None
@@ -37,19 +39,20 @@ class Asteroid:
 
     def move(self, paused):
         self.previous_pos = self.true_pos
-        if self.starting_pos[2] is False:
-            self.starting_pos[0] = self.true_pos[0]
-            self.starting_pos[1] = self.true_pos[1]
-            self.starting_pos[2] = True
         self.true_pos = [(self.pos[0] - self.star.pos[0]) * math.cos(.1 * self.angle * self.scalar) +
                          self.star.pos[0] + self.x_deviation,
                          (self.pos[1] - self.star.pos[1]) * math.sin(.1 * self.angle * self.scalar) +
                          self.star.pos[1] + self.y_deviation]
+        if self.starting_pos[2] is False:
+            self.starting_pos[0] = (self.true_pos[0] - self.star.pos[0]) * math.cos(0.1*0*self.scalar) + self.star.pos[0] + self.x_deviation
+            self.starting_pos[1] = (self.true_pos[1] - self.star.pos[1]) * math.cos(0.1*0*self.scalar) + self.star.pos[1] + self.y_deviation
+            self.starting_pos[2] = True
         if paused is False:
             self.angle += 2
         if self.angle > 1000:
-            if self.starting_pos[0] - .1 < self.true_pos[0] < self.starting_pos[0] + .1 and self.starting_pos[1] - .1 < self.true_pos[1] < self.starting_pos[1] + .1:
+            if 0.99999 < math.cos(.1 * self.scalar * self.angle) < 1.00001:
                 self.angle = 0
+                print("{} has successfully orbited the sun!".format(self.name))
 
     def gravity_to_star(self):
         self.scalar = sqrt(self.G * self.star.mass) / sqrt(((self.pos[0] - self.star.pos[0] - self.x_deviation) ** 2 +

@@ -8,7 +8,7 @@ from ResourceList import BigRockResources
 class Planet:
     G = (6.674 * 10 ** (-11))
 
-    def __init__(self, pos, radius, mass, colour, name, habitability, x_deviation, y_deviation):
+    def __init__(self, pos, radius, mass, colour, name, habitability, x_deviation, y_deviation, colonised):
         self.name = name
         self.pos = pos
         self.true_pos = self.pos
@@ -20,6 +20,7 @@ class Planet:
         self.x_deviation = x_deviation
         self.y_deviation = y_deviation
         self.habitability = habitability
+        self.colonised = colonised
 
         self.starting_pos = [0, 0, False]
         self.resources = None

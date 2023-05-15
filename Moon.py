@@ -6,7 +6,7 @@ from math import sqrt
 class Moon:
     G = (6.674 * 10 ** (-11))
 
-    def __init__(self, pos, radius, mass, colour, name):
+    def __init__(self, pos, radius, mass, colour, name, habitability, colonised):
         self.pos = pos
         self.true_pos = pos
         self.radius = radius
@@ -14,7 +14,10 @@ class Moon:
         self.colour = colour
         self.name = name
         self.main_planet_true_pos = [0, 0]
+        self.habitability = habitability
+        self.colonised = colonised
 
+        self.selected = False
         self.starting_pos = [0, 0, False]
         self.planet = None
         self.scalar = 0
@@ -49,7 +52,6 @@ class Moon:
         if self.angle > 1000:
             if 0.9999 < math.cos(.1 * self.scalar * self.angle) < 1.0001:
                 self.angle = 0
-                print("{} has successfully orbited the planet!".format(self.name))
 
     def gravity_to_planet(self):
         self.scalar = (self.mass * self.planet.mass * 1/750)/sqrt((self.true_pos[0] - self.planet.true_pos[0]) ** 2 +
@@ -63,9 +65,21 @@ class Moon:
         pygame.draw.circle(s, self.colour, self.true_pos, self.radius, width=self.radius - 1)
         pygame.draw.rect(s, self.colour, (self.true_pos[0] - 1, self.true_pos[1] - 1, 2, 2))
 
+        if self.selected is True:
+            pygame.draw.circle(s, 'white', self.true_pos, self.radius + 10, width=5)
+
     def draw_my_orbit(self, s):
         temp_pos = ((self.planet.true_pos[0] - (self.pos[0] - self.planet.true_pos[0])),
                     (self.planet.true_pos[1] - (self.pos[1] - self.planet.true_pos[1])))
         temp_radius = (2 * (self.pos[0] - self.planet.true_pos[0]), 2 * (self.pos[1] - self.planet.true_pos[1]))
         temp_rect = (temp_pos, temp_radius)
         pygame.draw.ellipse(s, '#ffffff', temp_rect, width=1)
+
+    def select_it(self):
+        self.selected = True
+
+    def unselect_it(self):
+        self.selected = False
+
+    def get_name(self):
+        return self.name

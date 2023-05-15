@@ -12,9 +12,10 @@ from ArrayList import MoonList
 from ArrayList import AsteroidList
 from ArrayList import WindowList
 from ResourceList import PlayerResources
-
+from ArrayList import ButtonList
 
 # classes
+
 
 class Button:
     def __init__(self, pos, size, colour_calm, colour_clicked, name, image_calm, image_clicked):
@@ -25,24 +26,38 @@ class Button:
         self.name = name
         self.image_calm = image_calm
         self.image_clicked = image_clicked
-        self.current_image = image_calm
+        self.current_image = image_calm[0]
         self.current_colour = self.colour_calm
         self.rectangle = pygame.Rect(self.pos[0], self.pos[1], self.size[0], self.size[1])
+
+        self.clicked = False
+        self.image_index = 0
 
     def mouse_clicked(self, event):
         x, y = pygame.mouse.get_pos()
         if pygame.mouse.get_pressed()[0]:
             if self.rectangle.collidepoint(x, y):
                 # self.current_colour = self.colour_clicked
-                self.current_image = self.image_clicked
-                key_clicked(self.name)
+                self.current_image = self.image_clicked[self.image_index]
+                self.clicked = True
             else:
                 # self.current_colour = self.colour_calm
                 pass
 
     def mouse_released(self):
-        if self.name != "pause":
-            self.current_image = self.image_calm
+
+        if self.clicked is True:
+            self.clicked = False
+            if self.name != "pause":
+                self.current_image = self.image_calm[self.image_index]
+
+            if self.name == 'pause':
+                if self.image_index == 0:
+                    self.image_index = 1
+                elif self.image_index == 1:
+                    self.image_index = 0
+                self.current_image = self.image_calm[self.image_index]
+            key_clicked(self.name)
 
     def show_button(self):
         # pygame.draw.rect(screen, self.current_colour, self.rectangle)
@@ -50,6 +65,22 @@ class Button:
 
 
 # methods
+
+
+def key_clicked(name):
+    global button_pause_bool
+    global button_plus_bool
+    global button_minus_bool
+    if name == 'pause' and button_pause_bool is False:
+        button_pause_bool = True
+    elif name == 'pause' and button_pause_bool is True:
+        button_pause_bool = False
+    if name == 'plus':
+        button_plus_bool = True
+        # button_plus.current_image = button_plus.image_clicked
+    if name == 'minus':
+        button_minus_bool = True
+        # button_minus.current_image = button_minus.image_clicked
 
 
 def distance_from_mouse_to_rocks():
@@ -71,8 +102,12 @@ def rock_clicked():
     global move_window
     flag_range_planet_index = None   # range_planet_index is saved here when the method wants to create a window.
     flag_to_make_a_window = True    # It is set to false when this method recognises that a window is already there.
+
     for delete in range(len(planets.array)):
         planets.array[delete].unselect_it()
+    for delete_moon_select in range(len(moons.array)):
+        moons.array[delete_moon_select].unselect_it()
+
     for range_planet_index in range(len(planets.array)):
         if planets.array[range_planet_index].radius > distances[range_planet_index]:
             # if planet radius is smaller than the one of the distance between mouse and a planet
@@ -88,6 +123,21 @@ def rock_clicked():
                         flag_to_make_a_window = False
             if flag_to_make_a_window:   # if flag is true, go to the create_window method to make one!
                 create_window(flag_range_planet_index)
+
+    for range_moon_index in range(len(moons.array)):
+        if moons.array[range_moon_index].radius > distances[range_moon_index + len(planets.array)]:
+            if range(len(windows.array)) == range(0, 0):
+                flag_range_planet_index = range_moon_index + len(planets.array)
+            else:
+                for check_windows in range(len(windows.array)):
+                    if moons.array[range_moon_index].name != windows.array[check_windows].name:
+                        flag_range_planet_index = range_moon_index + len(planets.array)
+                    else:
+                        flag_to_make_a_window = False
+            if flag_to_make_a_window:
+                print(flag_range_planet_index)
+                create_window(flag_range_planet_index)
+
     if flag_to_make_a_window:   # move the window a bit (50 pixels) to the right and down
         if move_window[0] != 400:
             move_window[0] += 50
@@ -98,28 +148,17 @@ def rock_clicked():
 
 
 def create_window(range_and_planets):
-    planets.array[range_and_planets].select_it()
-    windows.create_and_insert_window((200 + move_window[0], 50 + move_window[1]), (250, 400),
-                                     planets.array[range_and_planets],
-                                     (planets.array[range_and_planets].get_name()))
-
-
-def key_clicked(name):
-    global button_pause_bool
-    global button_plus_bool
-    global button_minus_bool
-    if name == 'pause' and button_pause_bool is False:
-        button_pause_bool = True
-        button_pause.current_image = button_pause.image_clicked
-    elif name == 'pause' and button_pause_bool:
-        button_pause_bool = False
-        button_pause.current_image = button_pause.image_calm
-    if name == 'plus':
-        button_plus_bool = True
-        # button_plus.current_image = button_plus.image_clicked
-    if name == 'minus':
-        button_minus_bool = True
-        # button_minus.current_image = button_minus.image_clicked
+    if range_and_planets < len(planets.array):
+        planets.array[range_and_planets].select_it()
+        windows.create_and_insert_window((200 + move_window[0], 50 + move_window[1]), (250, 400),
+                                         planets.array[range_and_planets],
+                                         (planets.array[range_and_planets].get_name()))
+    else:
+        moon_index = range_and_planets - len(planets.array)
+        moons.array[moon_index].select_it()
+        windows.create_and_insert_window((200 + move_window[0], 50 + move_window[1]), (250, 400),
+                                         moons.array[moon_index],
+                                         (moons.array[moon_index].get_name()))
 
 
 def move_clicked_window_index_forward(clicked_window_index):
@@ -229,16 +268,15 @@ def mainloop():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-                button_plus.mouse_clicked(event)
-                button_minus.mouse_clicked(event)
-                button_pause.mouse_clicked(event)
+                for amount_of_buttons in range(len(buttons.array)):
+                    buttons.array[amount_of_buttons].mouse_clicked(event)
                 clicked_down_at_planet = True
             elif event.type == pygame.MOUSEBUTTONUP:
                 for i in range(len(windows.array)):
                     windows.array[i].holds_the_bar = False
                     move_window_once = False
-                button_plus.mouse_released()
-                button_minus.mouse_released()
+                for amount_of_buttons in range(len(buttons.array)):
+                    buttons.array[amount_of_buttons].mouse_released()
                 mouse_x = 0
                 mouse_y = 0
             elif event.type == pygame.KEYDOWN:
@@ -250,6 +288,9 @@ def mainloop():
                             for check_true_origin in range(len(planets.array)):
                                 if planets.array[check_true_origin] is windows.array[i].origin:
                                     planets.array[check_true_origin].name = windows.array[i].name
+                            for check_true_origin_moon in range(len(moons.array)):
+                                if moons.array[check_true_origin_moon] is windows.array[i].origin:
+                                    moons.array[check_true_origin_moon].name = windows.array[i].name
                                     # This is terrible but it works ;c
                         elif event.key == K_BACKSPACE:
                             if len(windows.array[i].name) > 0:
@@ -278,8 +319,6 @@ def mainloop():
         #     asteroids.array[i].draw_my_orbit(screen)
 
         # --- StarPlanetMoonAsteroid ---
-
-        # pygame.draw.circle(screen, s1.colour, s1.pos, s1.radius, width=s1.radius-1)
         s1.draw_me(screen)
 
         for i in range(len(planets.array)):
@@ -292,10 +331,8 @@ def mainloop():
             asteroids.array[i].draw_me(screen)
 
         distance_from_mouse_to_rocks()
-        #distance()
 
         if pygame.mouse.get_pressed()[0] and clicked_down_at_planet is True:
-            # planet_clicked()
             rock_clicked()
 
         # --- Windows ---
@@ -309,16 +346,14 @@ def mainloop():
         pygame.draw.rect(screen, '#ffffff', date_rectangle)
         font = pygame.font.SysFont(None, 24)
         img = font.render(date_string, True, 'black')
-        #img = font.render(str(date_five_hours/5), True, 'black')
         screen.blit(img, date_rectangle)
         font = None
         img = None
 
         # --- Buttons ---
 
-        button_plus.show_button()
-        button_minus.show_button()
-        button_pause.show_button()
+        for amount_of_buttons in range(len(buttons.array)):
+            buttons.array[amount_of_buttons].show_button()
 
         # flip() the display to put your work on screen
         pygame.display.flip()
@@ -403,41 +438,41 @@ def mainloop():
 
 s1 = Star([500, 500], 80, 1989000000, '#ffff00')
 
-p1 = Planet([166, 166], 10, 20, '#333333', "p1", 0, 0, 0)
+p1 = Planet([166, 166], 10, 20, '#333333', "p1", 0, 0, 0, False)
 p1.main_star(s1)
-p2 = Planet([224, 224], 15, 30, '#a0b43a', "p2", 0, 0, 0)
+p2 = Planet([224, 224], 15, 30, '#a0b43a', "p2", 0, 0, 0, False)
 p2.main_star(s1)
-p3 = Planet([359, 359], 20, 40, '#00ff44', "p3", 100, 0, 0)
+p3 = Planet([359, 359], 20, 40, '#00ff44', "p3", 100, 0, 0, True)
 p3.main_star(s1)
-p4 = Planet([466, 466], 16, 32, '#dd4403', "p4", 0, 0, 0)
+p4 = Planet([466, 466], 16, 32, '#dd4403', "p4", 0, 0, 0, False)
 p4.main_star(s1)
-p5 = Planet([712, 712], 37, 74, '#ffff44', "p5", 0, 0, 0)
+p5 = Planet([712, 712], 37, 74, '#ffff44', "p5", 0, 0, 0, False)
 p5.main_star(s1)
-p6 = Planet([853, 853], 30, 60, '#f0f0aa', "p6", 0, 0, 0)
+p6 = Planet([853, 853], 30, 60, '#f0f0aa', "p6", 0, 0, 0, False)
 p6.main_star(s1)
-p7 = Planet([980, 980], 32, 64, '#0ff0ff', "p7", 0, 0, 0)
+p7 = Planet([980, 980], 32, 64, '#0ff0ff', "p7", 0, 0, 0, False)
 p7.main_star(s1)
-p8 = Planet([1147, 1147], 33, 66, '#a389be', "p8", 0, 0, 0)
+p8 = Planet([1147, 1147], 33, 66, '#a389be', "p8", 0, 0, 0, False)
 p8.main_star(s1)
-m1 = Moon([30, 30], 4, 8, '#a0a0a0', "m1")
+m1 = Moon([30, 30], 4, 8, '#a0a0a0', "m1", 0, False)
 m1.main_planet(p3)
-m2 = Moon([50, 50], 6, 12, "#a4a4a4", "m2")
+m2 = Moon([50, 50], 6, 12, "#a4a4a4", "m2", 0, False)
 m2.main_planet(p4)
-m3 = Moon([68, 68], 5, 10, '#a8a8a8', "m3")
+m3 = Moon([68, 68], 5, 10, '#a8a8a8', "m3", 0, False)
 m3.main_planet(p5)
-m4 = Moon([57, 57], 6, 12, '#a8a8a8', "m4")
+m4 = Moon([57, 57], 6, 12, '#a8a8a8', "m4", 0, False)
 m4.main_planet(p5)
-m5 = Moon([51, 51], 5, 10, '#a3a3a3', "m5")
+m5 = Moon([51, 51], 5, 10, '#a3a3a3', "m5", 0, False)
 m5.main_planet(p5)
-m6 = Moon([45, 45], 4, 8, '#f8a8a8', "m6")
+m6 = Moon([45, 45], 4, 8, '#f8a8a8', "m6", 0, False)
 m6.main_planet(p5)
-a1 = Asteroid([550, 550], 2, 4, '#a0a0a0', '#a1', 0, 0, 0, 0)
+a1 = Asteroid([550, 550], 2, 4, '#a0a0a0', 'a1', 0, 0, 0, 0, False)
 a1.main_star(s1)
-a2 = Asteroid([560, 560], 3, 6, '#a0a0a0', '#a2', 0, 0, 0, 69696969)
+a2 = Asteroid([560, 560], 3, 6, '#a0a0a0', 'a2', 0, 0, 0, 69696969, False)
 a2.main_star(s1)
-a3 = Asteroid([570, 570], 2, 4, '#a0a0a0', '#a3', 0, 0, 0, 4562)
+a3 = Asteroid([570, 570], 2, 4, '#a0a0a0', 'a3', 0, 0, 0, 4562, False)
 a3.main_star(s1)
-a4 = Asteroid([580, 580], 4, 8, '#a0a0a0', '#a4', 0, 0, 0, 8899)
+a4 = Asteroid([580, 580], 4, 8, '#a0a0a0', 'a4', 0, 0, 0, 8899, False)
 a4.main_star(s1)
 
 planets = PlanetList()
@@ -467,22 +502,44 @@ asteroids.add_asteroid(a4)
 
 # --- Images ---
 
-pause_image = pygame.image.load('Pause.png')                    # shown when the game is not paused
-play_image = pygame.image.load('Play.png')                      # shown when the game is paused
-plus_image = pygame.image.load('Plus.png')                      # always shown except when the button is clicked
-plus_clicked_image = pygame.image.load('Plus_Clicked.png')      # shown when the plus button is clicked
-minus_image = pygame.image.load('Minus.png')                    # always shown except when the button is clicked
-minus_clicked_image = pygame.image.load('Minus_Clicked.png')    # shown when the minus button is clicked
-UI_top = pygame.image.load('Blue.png')                          # always shown on the top
+pause_image = pygame.image.load('Pause_Button.png')                     # shown when the game is not paused
+pause_image_clicked = pygame.image.load('Pause_Button_Clicked.png')
+play_image = pygame.image.load('Play_Button.png')                   # shown when the game is paused
+play_image_clicked = pygame.image.load('Play_Button_Clicked.png')
+plus_image = pygame.image.load('Plus_Button.png')                   # always shown except when the button is clicked
+plus_image_clicked = pygame.image.load('Plus_Button_Clicked.png')       # shown when the plus button is clicked
+minus_image = pygame.image.load('Minus_Button.png')                 # always shown except when the button is clicked
+minus_image_clicked = pygame.image.load('Minus_Button_Clicked.png')     # shown when the minus button is clicked
+ships_image = pygame.image.load('Ships_Button.png')
+ships_image_clicked = pygame.image.load('Ships_Clicked_Button.png')
+planets_image = pygame.image.load('Planets_Button.png')
+planets_image_clicked = pygame.image.load('Planets_Clicked_Button.png')
+UI_top = pygame.image.load('Blue.png')                                  # always shown on the top
 
 # --- Buttons ---
 
-button_pause = Button((850, 0), (50, 50), '#00ff00', '#00aa00', "pause", pause_image, play_image)
+# button_science = Button[(700, 50), (50, 50), None, None, 'ships', [None, None], [None, None]]
+
+button_ships = Button((650, 0), (50, 50), None, None, 'ships', [ships_image, None], [ships_image_clicked, None])
+
+button_planets = Button((700, 0), (50, 50), None, None, 'planets', [planets_image, None], [planets_image_clicked, None])
+
+button_pause = Button((850, 0), (50, 50), '#00ff00', '#00aa00', "pause", [pause_image, play_image],
+                      [pause_image_clicked, play_image_clicked])
 # used to pause or resume the game
-button_plus = Button((900, 0), (50, 50), '#0000ff', '#0000aa', "plus", plus_image, plus_clicked_image)
+button_plus = Button((900, 0), (50, 50), '#0000ff', '#0000aa', "plus", [plus_image, None],
+                     [plus_image_clicked, None])
 # used to speed the game up
-button_minus = Button((950, 0), (50, 50), '#ff0000', '#aa0000', "minus", minus_image, minus_clicked_image)
+button_minus = Button((950, 0), (50, 50), '#ff0000', '#aa0000', "minus", [minus_image, None],
+                      [minus_image_clicked, None])
 # used to slow the game down
+
+buttons = ButtonList()
+buttons.add_button(button_ships)
+buttons.add_button(button_planets)
+buttons.add_button(button_pause)
+buttons.add_button(button_plus)
+buttons.add_button(button_minus)
 
 # --- UI things ---
 
@@ -508,7 +565,7 @@ mouse_y = 0                     # relative mouse_y location
 move_time_forward = 100000      # Moves the timer forward to make the planets start in a different position than on the right side
 time_forward = False            # If true, then move_time_forward is accepted
 accelerate_time = 16            # The greater the number, the faster the game progresses
-accelerate_time_bool = True     # If true, then the game uses accelerate_time to... accelerate the game
+accelerate_time_bool = False     # If true, then the game uses accelerate_time to... accelerate the game
 date_five_hours = 0             # The current displayed time measured in five hours per tick
 move_window_once = False        # Used to move clicked window in windows.array to the front only once
 background_colour = '#050550'   # Used as a background colour for the game

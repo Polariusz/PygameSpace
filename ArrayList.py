@@ -126,3 +126,15 @@ class WindowList:
                 self.array.pop(i)
                 print("IN ARRAYLIST|WindowList|-del_window_object: Window {}, deleted!".format(temp_name))
                 break
+
+
+class ButtonList:
+    def __init__(self):
+        self.array = []
+        self.temp = None
+
+    def add_button(self, b):
+        self.array.append(b)
+
+    def insert_button(self, b):
+        self.array.insert(0, b)
