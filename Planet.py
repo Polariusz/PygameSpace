@@ -1,8 +1,7 @@
 import math
 import pygame
 from math import sqrt
-
-from ResourceList import BigRockResources
+from ResourceList import RockFiniteResources
 
 
 class Planet:
@@ -23,13 +22,18 @@ class Planet:
         self.colonised = colonised
 
         self.starting_pos = [0, 0, False]
-        self.resources = None
         self.previous_pos = [None, None]
         self.scalar = 0
         self.star = None
         self.selected = False
         self.angle = 0
         self.completed_orbital_cycle = False
+
+        self.stored_resources = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0, 0, 0, 0],
+                                 [0, 0, 0]]
+        self.produced_resources = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0, 0, 0, 0],
+                                   [0, 0, 0]]
+        self.finite_resources = None
 
     def main_star(self, star):
         self.star = star
@@ -90,8 +94,26 @@ class Planet:
         temp_rect = (temp_pos, temp_radius)
         pygame.draw.ellipse(s, '#ffffff', temp_rect, width=1)
 
-    def create_resources(self, energy, minerals, metals, retail_goods, food, water, fossil_fuels, rare_elements,
-                         chemicals, bio_resources, science, population, labour):
-        self.resources = BigRockResources(
-                    self.radius, energy, minerals, metals, retail_goods, food, water, fossil_fuels, rare_elements,
-                    chemicals, bio_resources, science, population, labour)
+    def set_finite_resources(self, raw_metal, uranium, limestone, granite, liquid_fossil, solid_fossil, water):
+        self.finite_resources = RockFiniteResources(raw_metal=raw_metal, uranium=uranium, limestone=limestone,
+                                                    granite=granite, liquid_fossil=liquid_fossil,
+                                                    solid_fossil=solid_fossil, water=water)
+
+    def update_stored_resources(self):
+        for zero in range(len(self.stored_resources[0])):
+            self.stored_resources[0][zero] = self.stored_resources[0][zero] + self.produced_resources[0][zero]
+
+        for one in range(len(self.stored_resources[1])):
+            self.stored_resources[1][one] = self.stored_resources[1][one] + self.produced_resources[1][one]
+
+        for two in range(len(self.stored_resources[2])):
+            self.stored_resources[2][two] = self.stored_resources[2][two] + self.produced_resources[2][two]
+
+        for three in range(len(self.stored_resources[3])):
+            self.stored_resources[3][three] = self.stored_resources[3][three] + self.produced_resources[3][three]
+
+        for four in range(len(self.stored_resources[4])):
+            self.stored_resources[4][four] = self.stored_resources[4][four] + self.produced_resources[4][four]
+
+        for five in range(len(self.stored_resources[5])):
+            self.stored_resources[5][five] = self.stored_resources[5][five] + self.produced_resources[5][five]

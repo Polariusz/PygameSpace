@@ -1,6 +1,7 @@
 import math
 import pygame
 from math import sqrt
+from ResourceList import RockFiniteResources
 
 
 class Moon:
@@ -24,6 +25,12 @@ class Moon:
         self.angle = 0
         self.x = 0
         self.y = 0
+
+        self.stored_resources = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0, 0, 0, 0],
+                                 [0, 0, 0]]
+        self.produced_resources = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0, 0, 0, 0],
+                                   [0, 0, 0]]
+        self.finite_resources = None
 
     def main_planet(self, planet):
         self.planet = planet
@@ -83,3 +90,27 @@ class Moon:
 
     def get_name(self):
         return self.name
+
+    def set_finite_resources(self, raw_metal, uranium, limestone, granite, liquid_fossil, solid_fossil, water):
+        self.finite_resources = RockFiniteResources(raw_metal=raw_metal, uranium=uranium, limestone=limestone,
+                                                    granite=granite, liquid_fossil=liquid_fossil,
+                                                    solid_fossil=solid_fossil, water=water)
+
+    def update_stored_resources(self):
+        for zero in range(len(self.stored_resources[0])):
+            self.stored_resources[0][zero] = self.stored_resources[0][zero] + self.produced_resources[0][zero]
+
+        for one in range(len(self.stored_resources[1])):
+            self.stored_resources[1][one] = self.stored_resources[1][one] + self.produced_resources[1][one]
+
+        for two in range(len(self.stored_resources[2])):
+            self.stored_resources[2][two] = self.stored_resources[2][two] + self.produced_resources[2][two]
+
+        for three in range(len(self.stored_resources[3])):
+            self.stored_resources[3][three] = self.stored_resources[3][three] + self.produced_resources[3][three]
+
+        for four in range(len(self.stored_resources[4])):
+            self.stored_resources[4][four] = self.stored_resources[4][four] + self.produced_resources[4][four]
+
+        for five in range(len(self.stored_resources[5])):
+            self.stored_resources[5][five] = self.stored_resources[5][five] + self.produced_resources[5][five]
