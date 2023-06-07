@@ -138,3 +138,21 @@ class ButtonList:
 
     def insert_button(self, b):
         self.array.insert(0, b)
+
+
+class BuildingList:
+    def __init__(self):
+        self.array = []
+        self.temp = None
+
+
+class ConstructedBuildingList:
+    def __init__(self):
+        self.array = []
+        self.temp = None
+
+
+class BuildingsUnderConstructionList:
+    def __init__(self):
+        self.array = []
+        self.temp = None

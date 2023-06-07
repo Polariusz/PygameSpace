@@ -29,9 +29,9 @@ class Asteroid:
         self.angle = set_angle
         self.completed_orbital_cycle = False
 
-        self.stored_resources = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0, 0, 0, 0],
+        self.stored_resources = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0, 0, 0, 0],
                                  [0, 0, 0]]
-        self.produced_resources = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0, 0, 0, 0],
+        self.produced_resources = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0, 0, 0, 0],
                                    [0, 0, 0]]
         self.finite_resources = None
 
